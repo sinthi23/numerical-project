@@ -63,19 +63,22 @@ A linear equation is an equation in which the highest power (degree) of the vari
 
 #### Gauss Elimination Theory
 
-
+[Add your Gauss Elimination theory here]
 
 #### Gauss Elimination Code
-
-[View Code](./Linear%20Equation%20Methods/Gauss%20Elimination%20Method/code.cpp)
+```cpp
+// Add your Gauss Elimination code here
+```
 
 #### Gauss Elimination Input
-
-[View Input](./Linear%20Equation%20Methods/Gauss%20Elimination%20Method/input.txt)
+```
+Add your Gauss Elimination input here
+```
 
 #### Gauss Elimination Output
-
-[View Output](./Linear%20Equation%20Methods/Gauss%20Elimination%20Method/output.txt)
+```
+Add your Gauss Elimination output here
+```
 
 ---
 
@@ -83,19 +86,22 @@ A linear equation is an equation in which the highest power (degree) of the vari
 
 #### Gauss Jordan Theory
 
-[View Theory](./Linear%20Equation%20Methods/Gauss%20Jordan%20Elimination%20Method/Theory.md)
+[Add your Gauss Jordan theory here]
 
 #### Gauss Jordan Code
-
-[View Code](./Linear%20Equation%20Methods/Gauss%20Jordan%20Elimination%20Method/code.cpp)
+```cpp
+// Add your Gauss Jordan code here
+```
 
 #### Gauss Jordan Input
-
-[View Input](./Linear%20Equation%20Methods/Gauss%20Jordan%20Elimination%20Method/input.txt)
+```
+Add your Gauss Jordan input here
+```
 
 #### Gauss Jordan Output
-
-[View Output](./Linear%20Equation%20Methods/Gauss%20Jordan%20Elimination%20Method/output.txt)
+```
+Add your Gauss Jordan output here
+```
 
 ---
 
@@ -122,7 +128,7 @@ As we perform row operations, keep track of the multipliers used to eliminate th
 - The diagonal of L will consist of 1s.
 
 #### LU Decomposition Code
-
+```cpp
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -204,10 +210,10 @@ int main() {
 
   return 0;
 }
-
+```
 
 #### LU Decomposition Input
-
+```
 3
 2 -1 -2
 -4 6 3
@@ -215,10 +221,10 @@ int main() {
 -2
 9
 -5
-
+```
 
 #### LU Decomposition Output
-
+```
 L Matrix:
          1          0          0 
         -2          1          0 
@@ -231,6 +237,7 @@ U Matrix:
 
 Solution Vector X:
 -1.875 0.916667 -1.33333 
+```
 
 ---
 
@@ -254,7 +261,7 @@ X = A^(-1)B
 4. Compute the inverse: A^(-1) = (1 / (|A|)) * adj(A).
 
 #### Matrix Inversion Code
-
+```cpp
 #include <cmath>
 #include <fstream>
 #include <iomanip>
@@ -320,10 +327,8 @@ void adjoint(double A[10][10], double adj[10][10], int n) {
 }
 
 int main() {
-  ifstream fin("D:\\Numerical project\\Linear Equation Methods\\Matrix "
-               "inversion\\input.txt");
-  ofstream fout("D:\\Numerical project\\Linear Equation Methods\\Matrix "
-                "inversion\\output.txt");
+  ifstream fin("input.txt");
+  ofstream fout("output.txt");
 
   int n;
   fin >> n;
@@ -373,18 +378,18 @@ int main() {
   fout.close();
   return 0;
 }
-
+```
 
 #### Matrix Inversion Input
-
+```
 3
 2 -1 -2 -2
 -4 6 3 9
 -4 -2 8 -5
-
+```
 
 #### Matrix Inversion Output
-
+```
 Determinant = 24
 
 Inverse Matrix:
@@ -396,7 +401,7 @@ Solution Vector X:
 x1 = -1.875
 x2 = 0.916667
 x3 = -1.33333
-
+```
 
 ---
 
@@ -429,7 +434,7 @@ X0 =(x1 + x2)/2
 - (iii) If f(x0) * f(x2) < 0, then root is between x0 and x2.
 
 #### Bisection Code
-
+```cpp
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -470,8 +475,8 @@ double bisection(double a, double b, double E, ofstream &out){
 }
 
 int main(){
-    ifstream input("D:\\Numerical project\\Bisection method\\input.txt");
-    ofstream out("D:\\Numerical project\\Bisection method\\output.txt");
+    ifstream input("input.txt");
+    ofstream out("output.txt");
 
     double start, ends;
     input >> start >> ends;
@@ -504,14 +509,15 @@ int main(){
     out.close();
     return 0;
 }
+```
 
 #### Bisection Input
-
+```
 -2.24  2.24
-
+```
 
 #### Bisection Output
-
+```
 The search interval is: -2.240000 to 2.240000
 
 iterations : 13
@@ -519,8 +525,7 @@ The roots are in between -1.040000 and -0.940000 the root is = -0.999998
 
 iterations : 11
 The roots are in between -0.040000 and 0.060000 the root is = -0.000010
-
-
+```
 
 ---
 
@@ -544,7 +549,7 @@ X0 = x1 - f(x1) * (x2 – x1)/ (f(x2) - f(x1))
 - (iii) If f(x0) * f(x2) < 0, then root is between x0 and x2.
 
 #### False Position Code
-
+```cpp
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -585,8 +590,8 @@ double falsePosition(double a, double b, double E, ofstream &out){
 }
 
 int main(){
-    ifstream input("D:\\Numerical project\\False Position method\\input.txt");
-    ofstream out("D:\\Numerical project\\False Position method\\output.txt");
+    ifstream input("input.txt");
+    ofstream out("output.txt");
 
     double start, ends;
     input >> start >> ends;
@@ -619,14 +624,15 @@ int main(){
     out.close();
     return 0;
 }
+```
 
 #### False Position Input
-
+```
 -2.24 2.24
-
+```
 
 #### False Position Output
-
+```
 The search interval is: -2.240000 to 2.240000
 
 iterations : 4
@@ -634,8 +640,7 @@ The roots are in between -1.040000 and -0.940000 the root is = -0.999999
 
 iterations : 2
 The roots are in between -0.040000 and 0.060000 the root is = -0.000014
-
-
+```
 
 ---
 
@@ -656,7 +661,7 @@ X(n+1) = xn – (f(xn)/f'(xn))
 - The iteration continues until the difference between two successive values of x becomes sufficiently small.
 
 #### Newton-Raphson Code
-
+```cpp
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -709,8 +714,8 @@ void newton(double x, double &r, ofstream &out) {
 }
 
 int main() {
-    ifstream input("D:\\Numerical project\\Newton Raphson method\\input.txt");
-    ofstream out("D:\\Numerical project\\Newton Raphson method\\output.txt");
+    ifstream input("input.txt");
+    ofstream out("output.txt");
 
     if(!input){
         cout << "Error: input.txt not found!\n";
@@ -750,14 +755,15 @@ int main() {
     out.close();
     return 0;
 }
-
+```
 
 #### Newton-Raphson Input
-
+```
 -2.23 2.23
+```
 
 #### Newton-Raphson Output
-
+```
 Newton-Raphson Method
 Search interval: -2.230000 to 2.230000
 
@@ -769,8 +775,7 @@ The root 0.000000 is found after 3 iterations.
 
 Interval [0.770000, 1.270000] seems to contain a root.
 The root 1.000000 is found after 5 iterations.
-
-
+```
 
 ---
 
@@ -787,17 +792,19 @@ The secant method will find a root of a function f if the starting points x0 and
 This means the method improves quickly but not as fast as some other methods.
 
 #### Secant Code
-
-[View Code](./Non-Linear%20Equation%20Methods/Secant%20Method/code.cpp)
+```cpp
+// Add your Secant Method code here
+```
 
 #### Secant Input
-
-[View Input](./Non-Linear%20Equation%20Methods/Secant%20Method/input.txt)
+```
+Add your Secant Method input here
+```
 
 #### Secant Output
-
-[View Output](./Non-Linear%20Equation%20Methods/Secant%20Method/output.txt)
+```
+Add your Secant Method output here
+```
 
 ---
 
-## Repository Structure
