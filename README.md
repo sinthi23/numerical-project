@@ -70,10 +70,16 @@ A comprehensive collection of numerical methods implementations in C++ for solvi
     - [Input](#divided-difference-input)
     - [Output](#divided-difference-output)
 - [Numerical Differentiation](#numerical-differentiation)
-  - [Theory](#numerical-differentiation-theory)
-  - [Code](#numerical-differentiation-code)
-  - [Input](#numerical-differentiation-input)
-  - [Output](#numerical-differentiation-output)
+  - [Newton's Forward Differentiation](#newtons-forward-differentiation)
+    - [Theory](#newtons-forward-differentiation-theory)
+    - [Code](#newtons-forward-differentiation-code)
+    - [Input](#newtons-forward-differentiation-input)
+    - [Output](#newtons-forward-differentiation-output)
+  - [Newton's Backward Differentiation](#newtons-backward-differentiation)
+    - [Theory](#newtons-backward-differentiation-theory)
+    - [Code](#newtons-backward-differentiation-code)
+    - [Input](#newtons-backward-differentiation-input)
+    - [Output](#newtons-backward-differentiation-output)
 - [Curve Fitting](#curve-fitting)
   - [Linear Equation](#curve-fitting-linear)
     - [Theory](#linear-theory)
@@ -492,17 +498,89 @@ This means the method improves quickly but not as fast as some other methods.
 
 #### Secant Code
 ```cpp
-// Add your Secant Method code here
+#include <bits/stdc++.h>
+using namespace std;
+
+const double E = 1e-6;
+const int max_it = 1000;
+
+double f(double x) {
+    return 3*x - cos(x) - 1;
+}
+
+void secant(double x, double x1, double &r, ofstream &out) {
+    double fx = f(x);
+    double fx1 = f(x1);
+
+    r = x1 - ((fx1 * (x1 - x)) / (fx1 - fx));
+    int counts = 0;
+
+    while (fabs(x1 - x) >= E && counts < max_it) {
+        counts++;
+        fx = f(x);
+        fx1 = f(x1);
+
+        r = x1 - ((fx1 * (x1 - x)) / (fx1 - fx));
+        x = x1;
+        x1 = r;
+    }
+
+    if (counts >= max_it) {
+        out << "No real root is found in this interval.\n";
+        return;
+    }
+
+    out << "The root " << r << " is found after " << counts << " iterations.\n";
+}
+
+int main() {
+    ifstream input("input.txt");
+    ofstream out("output.txt");
+
+    if (!input) {
+        cout << "ERROR: input.txt not found!\n";
+        return 0;
+    }
+
+    double start, ends;
+    input >> start >> ends;
+    input.close();
+
+    double step = 0.5;
+    double a = start, b, r;
+
+    out << fixed << setprecision(6);
+    out << "Secant Method\n";
+    out << "Checking intervals for possible roots...\n";
+
+    while (a < ends) {
+        b = a + step;
+
+        if (f(a) * f(b) < 0) {
+            out << "\nInterval [" << a << ", " << b << "] seems to contain a root.\n";
+            secant(a, b, r, out);
+        }
+
+        a = b;
+    }
+
+    out.close();
+    return 0;
+}
 ```
 
 #### Secant Input
 ```
-Add your Secant Method input here
+-2.23 2.23
 ```
 
 #### Secant Output
 ```
-Add your Secant Method output here
+Secant Method
+Checking intervals for possible roots...
+
+Interval [0.270000, 0.770000] seems to contain a root.
+The root 0.607102 is found after 4 iterations.
 ```
 
 ---
@@ -520,21 +598,77 @@ A linear equation is an equation in which the highest power (degree) of the vari
 
 #### Gauss Elimination Theory
 
-[Add your Gauss Elimination theory here]
+The Gauss Elimination Method is used to solve a system of linear equations by converting it into an upper triangular matrix and then solving it by back substitution.
+
+Steps:
+1. Write the augmented matrix of the system of equations.
+2. Forward Elimination:
+   - Eliminate elements below the main diagonal using row operations.
+   - Convert the matrix into an upper triangular form.
+3. Back Substitution:
+   - Start from the last row and calculate the value of the last variable.
+   - Substitute this value into the rows above to find the remaining variables.
+4. Result:
+   - All variables are calculated step by step.
 
 #### Gauss Elimination Code
 ```cpp
-// Add your Gauss Elimination code here
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int main() {
+    ifstream fin("input.txt");     
+    ofstream fout("output.txt");   
+
+    int n;
+    fin >> n;
+
+    float a[10][11], x[10];
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j <= n; j++)
+            fin >> a[i][j];
+
+    for (int i = 0; i < n - 1; i++) {
+        for (int k = i + 1; k < n; k++) {
+            float f = a[k][i] / a[i][i];
+            for (int j = i; j <= n; j++)
+                a[k][j] -= f * a[i][j];
+        }
+    }
+
+    for (int i = n - 1; i >= 0; i--) {
+        x[i] = a[i][n];
+        for (int j = i + 1; j < n; j++)
+            x[i] -= a[i][j] * x[j];
+        x[i] /= a[i][i];
+    }
+
+    for (int i = 0; i < n; i++)
+        fout << "x" << i + 1 << " = " << x[i] << endl;
+
+    fin.close();
+    fout.close();
+
+    return 0;
+}
 ```
 
 #### Gauss Elimination Input
 ```
-Add your Gauss Elimination input here
+3
+2 1 -1 8
+-3 -1 2 -11
+-2 1 2 -3
 ```
 
 #### Gauss Elimination Output
 ```
-Add your Gauss Elimination output here
+x1 = 2
+x2 = 3
+x3 = -1
 ```
 
 ---
@@ -543,21 +677,76 @@ Add your Gauss Elimination output here
 
 #### Gauss Jordan Theory
 
-[Add your Gauss Jordan theory here]
+The Gauss–Jordan Elimination Method is used to solve a system of linear equations by reducing the augmented matrix to diagonal form (or reduced row echelon form), so that the solution can be read directly without back substitution.
+
+Steps:
+1. Write the augmented matrix of the system of equations.
+2. Forward Elimination:
+   - Eliminate elements below the main diagonal to form an upper triangular matrix.
+3. Backward Elimination:
+   - Eliminate elements above the main diagonal to form a diagonal matrix.
+4. Normalization:
+   - Divide each row by its pivot element so that all diagonal elements become 1.
+5. Result:
+   - The solution of the system is directly obtained from the last column of the matrix.
 
 #### Gauss Jordan Code
 ```cpp
-// Add your Gauss Jordan code here
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+int main() {
+    ifstream fin("input.txt");
+    ofstream fout("output.txt");
+
+    int n;
+    fin >> n;
+
+    float a[10][11];
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j <= n; j++)
+            fin >> a[i][j];
+
+    for (int i = 0; i < n; i++) {
+        float p = a[i][i];
+        for (int j = 0; j <= n; j++)
+            a[i][j] /= p;
+
+        for (int k = 0; k < n; k++) {
+            if (k != i) {
+                float f = a[k][i];
+                for (int j = 0; j <= n; j++)
+                    a[k][j] -= f * a[i][j];
+            }
+        }
+    }
+
+    for (int i = 0; i < n; i++)
+        fout << "x" << i + 1 << " = " << a[i][n] << endl;
+
+    fin.close();
+    fout.close();
+
+    return 0;
+}
 ```
 
 #### Gauss Jordan Input
 ```
-Add your Gauss Jordan input here
+3
+2 1 -1 8
+-3 -1 2 -11
+-2 1 2 -3
 ```
 
 #### Gauss Jordan Output
 ```
-Add your Gauss Jordan output here
+x1 = 2
+x2 = 3
+x3 = -1
 ```
 
 ---
@@ -870,26 +1059,92 @@ x3 = -1.33333
 
 #### Runge-Kutta Theory
 
-[Add your Runge-Kutta theory here]
+The Runge-Kutta 4th Order Method (RK4) is a numerical technique to solve ordinary differential equations (ODEs) of the form:
+    dy / dx = f(x , y) ,  y(x0) = y0
+It is more accurate than simple methods because it estimates the slope at multiple points within a step.
+
+Steps:
+1. Start with initial values:
+   x = x0 ,   y = y0
+   and choose a step size h.
+2. Calculate intermediate slopes:
+   k1 = h ⋅ f( x, y )
+   k2 = h ⋅ f( x + h / 2 , y + k1 / 2)
+   k3 = h ⋅ f( x + h / 2 , y + k2 / 2)
+   k4 = h ⋅ f( x + h , y + k3 ) 
+3. Update the solution:
+   y(next) = y + ( k1 + 2*k2 + 2*k3 + k4 ) / 6
+   x(next) = x + h 
+4. Repeat the process until reaching the desired value of x = xn .
 
 #### Runge-Kutta Code
 ```cpp
-// Add your Runge-Kutta code here
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+
+using namespace std;
+
+double f(double x, double y) {
+    return x + y * y;
+}
+
+int main() {
+    ifstream fin("input.txt");
+    ofstream fout("output.txt");
+
+    double x0, y0, xn, h;
+
+    fin >> x0;
+    fin >> y0;
+    fin >> xn;
+    fin >> h;
+
+    double x = x0;
+    double y = y0;
+    int iteration = 0;
+
+    while (x < xn) {
+        double k1 = h * f(x, y);
+        double k2 = h * f(x + h/2, y + k1/2);
+        double k3 = h * f(x + h/2, y + k2/2);
+        double k4 = h * f(x + h, y + k3);
+
+        y = y + (k1 + 2*k2 + 2*k3 + k4) / 6;
+        x = x + h;
+        iteration++;
+    }
+
+    fout << fixed << setprecision(5);
+    fout << "Value of y at x = " << xn << " is: " << y << endl;
+    fout << "Total iterations = " << iteration << endl;
+
+    fin.close();
+    fout.close();
+
+    return 0;
+}
 ```
 
 #### Runge-Kutta Input
 ```
-Add your Runge-Kutta input here
+0
+1
+0.2
+0.1
 ```
 
 #### Runge-Kutta Output
 ```
-Add your Runge-Kutta output here
+Value of y at x = 0.20000 is: 1.27356
+Total iterations = 2
 ```
 
 ---
 
 ## Interpolation
+
+Interpolation is the process of estimating the value of a function at a point that lies between two known data points. It uses known values of a function to construct a new function (often a polynomial) that approximates the original function and allows us to compute missing values inside the data interval.
 
 ---
 
@@ -897,21 +1152,86 @@ Add your Runge-Kutta output here
 
 #### Newtons Forward Theory
 
-[Add your Newton's Forward Interpolation theory here]
+- Newton's forward interpolation method is used to estimate values near the beginning of a table when data points (x is data point) are equally spaced.
+
+- Let x₀, x₁, x₂, … , xₙ₋₁, xₙ be a set of equally spaced values of the independent variable x.
+
+- So x₁ − x₀ = x₂ − x₁ = x₃ − x₂ = … = xₙ − xₙ₋₁ = h
+
+- Let, u = (x − x₀) / h
+
+- The Newton's forward difference interpolation formula for equal intervals is:
+    y = y₀ + u Δy₀ + [u(u − 1) / 2!] Δ²y₀+ [u(u − 1)(u − 2) / 3!] Δ³y₀+ … + [u(u − 1)(u − 2) … (u − n - 1) / n!] Δⁿy₀
 
 #### Newtons Forward Code
 ```cpp
-// Add your Newton's Forward Interpolation code here
+#include <bits/stdc++.h>
+using namespace std;
+
+double facto(int n){
+    double f=1;
+    for(int i=2;i<=n;i++)f*=i;
+    return f;
+}
+
+int main(){
+    int n;cin>>n;
+    vector<double>x(n),y(n);
+
+    for(int i=0;i<n;i++)
+        cin>>x[i]>>y[i];
+
+    double x_val;cin>>x_val;
+
+    vector<vector<double>>diff(n,vector<double>(n));
+
+    for(int i=0;i<n;i++)
+        diff[i][0]=y[i];
+
+    for(int j=1;j<n;j++){
+        for(int i=0;i<n-j;i++){
+            diff[i][j]=diff[i+1][j-1]-diff[i][j-1];
+            diff[i][j]=round(diff[i][j]*1e6)/1e6;
+        }
+    }
+    cout<<"Forward Difference Table:\n";
+    for(int i=0;i<n;i++){
+        cout<<setw(6)<<x[i];
+        for(int j=0;j<n-i;j++)
+            cout<<setw(10)<<diff[i][j];
+        cout<<endl;
+    }
+    double h=x[1]-x[0],u=(x_val-x[0])/h,ans=diff[0][0],u_prod=1;
+    for(int i=1;i<n;i++){
+        u_prod*=(u-(i-1));
+        ans+=(u_prod*diff[0][i])/facto(i);
+    }
+    cout<<"\nInterpolated Value at x="<<x_val<<" is: "<<ans<<endl;
+    return 0;
+}
 ```
 
 #### Newtons Forward Input
 ```
-Add your Newton's Forward Interpolation input here
+5
+1 1
+2 8
+3 27
+4 64
+5 125
+2.5
 ```
 
 #### Newtons Forward Output
 ```
-Add your Newton's Forward Interpolation output here
+Forward Difference Table:
+     1         1         7        12         6         0
+     2         8        19        18         6
+     3        27        37        24
+     4        64        61
+     5       125
+
+Interpolated Value at x=2.5 is: 15.625
 ```
 
 ---
@@ -920,21 +1240,84 @@ Add your Newton's Forward Interpolation output here
 
 #### Newtons Backward Theory
 
-[Add your Newton's Backward Interpolation theory here]
+- Backward interpolation is used when the value of x lies near the end of the table.
+
+- Let x₀, x₁, x₂, … , xₙ₋₁, xₙ be a set of equally spaced values of the independent variable x.
+
+- The interval between successive values is constant, i.e., x₁ − x₀ = x₂ − x₁ = x₃ − x₂ = … = xₙ − xₙ₋₁ = h
+
+- Let, u = (x − xₙ) / h
+
+- The Newton's backward difference interpolation formula for equal intervals is:
+  y = yₙ + u∇yₙ+ [u(u + 1) / 2!] ∇²yₙ+ [u(u + 1)(u + 2) / 3!] ∇³yₙ+ … + [u(u + 1)(u + 2)…(u + n − 1) / n!] ∇ⁿyₙ
 
 #### Newtons Backward Code
 ```cpp
-// Add your Newton's Backward Interpolation code here
+#include <bits/stdc++.h>
+using namespace std;
+
+double facto(int n){
+    double f=1;
+    for(int i=2;i<=n;i++)f*=i;
+    return f;
+}
+
+int main(){
+    int n;cin>>n;
+    vector<double>x(n),y(n);
+    for(int i=0;i<n;i++)cin>>x[i]>>y[i];
+    double x_val;cin>>x_val;
+
+    vector<vector<double>>diff(n,vector<double>(n));
+    for(int i=0;i<n;i++)diff[i][0]=y[i];
+
+    for(int j=1;j<n;j++)
+        for(int i=n-1;i>=j;i--){
+            diff[i][j]=diff[i][j-1]-diff[i-1][j-1];
+            diff[i][j]=round(diff[i][j]*1e6)/1e6;
+        }
+
+    cout<<"Backward Difference Table:\n";
+    for(int i=0;i<n;i++){
+        cout<<setw(6)<<x[i];
+        for(int j=0;j<=i;j++)cout<<setw(10)<<diff[i][j];
+        cout<<endl;
+    }
+
+    double h=x[1]-x[0];
+    double u=(x_val-x[n-1])/h;
+    double ans=diff[n-1][0],u_prod=1;
+    for(int i=1;i<n;i++){
+        u_prod*=(u+(i-1));
+        ans+=(u_prod*diff[n-1][i])/facto(i);
+    }
+
+    cout<<"\nInterpolated Value at x="<<x_val<<" is: "<<ans<<endl;
+    return 0;
+}
 ```
 
 #### Newtons Backward Input
 ```
-Add your Newton's Backward Interpolation input here
+5
+1 1
+2 8
+3 27
+4 64
+5 125
+4.5
 ```
 
 #### Newtons Backward Output
 ```
-Add your Newton's Backward Interpolation output here
+Backward Difference Table:
+     1         1
+     2         8         7
+     3        27        19        12
+     4        64        37        18         6
+     5       125        61        24         6         0
+
+Interpolated Value at x=4.5 is: 91.125
 ```
 
 ---
@@ -943,44 +1326,129 @@ Add your Newton's Backward Interpolation output here
 
 #### Divided Difference Theory
 
-[Add your Divided Difference Method theory here]
+- The Newton's Divided Difference Interpolation Method is used to estimate the value of a function when the given data points are not equally spaced.
+
+- The interpolation polynomial is given by:
+
+f(xₙ)= f(x₀) + (x - x₀) f [x₁, x₀] + (x - x₀)(x - x₁) f[x₂, x₁, x₀] +...+ (x - x₀)(x - x₁)...(x − xₙ₋₁) f[xₙ, xₙ₋₁,..., x₁, x₀]...(1)
+
+Here divided differences are defined as:
+
+- First order divided difference:
+f [ xᵢ, xⱼ ] = [ f(xᵢ) - f(xⱼ) ] / xᵢ - xⱼ …..(2)
+
+- Second order divided difference:
+f [ xᵢ, xⱼ, xₖ ] = [ f(xᵢ, xⱼ) - f(xⱼ, xₖ) ] / xᵢ - xₖ …..(3)
 
 #### Divided Difference Code
 ```cpp
-// Add your Divided Difference Method code here
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+int main(){
+    int n;
+    cin>>n;
+
+    double x[50],y[50][50],X;
+
+    for(int i=0;i<n;i++)
+        cin>>x[i]>>y[i][0];
+
+    cin>>X;
+
+    for(int j=1;j<n;j++)
+        for(int i=0;i<n-j;i++)
+            y[i][j]=(y[i+1][j-1]-y[i][j-1])/(x[i+j]-x[i]);
+
+    cout<<"Divided Difference Table:\n";
+    for(int i=0;i<n;i++){
+        cout<<setw(6)<<x[i];
+        for(int j=0;j<n-i;j++)
+            cout<<setw(12)<<y[i][j];
+        cout<<endl;
+    }
+
+    double ans=y[0][0],term=1;
+    for(int i=1;i<n;i++){
+        term*=(X-x[i-1]);
+        ans+=term*y[0][i];
+    }
+
+    cout<<"\nInterpolated value: "<<ans<<endl;
+    return 0;
+}
 ```
 
 #### Divided Difference Input
 ```
-Add your Divided Difference Method input here
+4
+1 1
+2 4
+4 16
+7 49
+3
 ```
 
 #### Divided Difference Output
 ```
-Add your Divided Difference Method output here
+Divided Difference Table:
+     1           1           3           1           0
+     2           4           6           1
+     4          16          11
+     7          49
+
+Interpolated value: 9
 ```
 
 ---
 
 ## Numerical Differentiation
 
-#### Numerical Differentiation Theory
+---
 
-[Add your Numerical Differentiation theory here]
+### Newton's Forward Differentiation
 
-#### Numerical Differentiation Code
+#### Newtons Forward Differentiation Theory
+
+[Add your Newton's Forward Differentiation theory here]
+
+#### Newtons Forward Differentiation Code
 ```cpp
-// Add your Numerical Differentiation code here
+// Add your Newton's Forward Differentiation code here
 ```
 
-#### Numerical Differentiation Input
+#### Newtons Forward Differentiation Input
 ```
-Add your Numerical Differentiation input here
+Add your Newton's Forward Differentiation input here
 ```
 
-#### Numerical Differentiation Output
+#### Newtons Forward Differentiation Output
 ```
-Add your Numerical Differentiation output here
+Add your Newton's Forward Differentiation output here
+```
+
+---
+
+### Newton's Backward Differentiation
+
+#### Newtons Backward Differentiation Theory
+
+[Add your Newton's Backward Differentiation theory here]
+
+#### Newtons Backward Differentiation Code
+```cpp
+// Add your Newton's Backward Differentiation code here
+```
+
+#### Newtons Backward Differentiation Input
+```
+Add your Newton's Backward Differentiation input here
+```
+
+#### Newtons Backward Differentiation Output
+```
+Add your Newton's Backward Differentiation output here
 ```
 
 ---
@@ -997,17 +1465,63 @@ Add your Numerical Differentiation output here
 
 #### Linear Code
 ```cpp
-// Add your Linear Curve Fitting code here
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cin>>n;
+
+    vector<double>x(n),y(n);
+    for(int i=0;i<n;i++)
+        cin>>x[i]>>y[i];
+
+    double sumx =0,sumy=0,sumxy=0, sumx2=0;
+
+    for (int i=0;i<n;i++) {
+        sumx  += x[i];
+        sumy  += y[i];
+        sumxy += x[i]*y[i];
+        sumx2 += x[i]*x[i];
+    }
+
+    double b=(n*sumxy-sumx* sumy)/(n*sumx2-sumx*sumx);
+    double a=(sumy-b*sumx)/n;
+
+    cout<<fixed<<setprecision(4);
+    cout<<"a(intercept) = "<<a<<"\n";
+    cout<<"b(slope) = "<<b<<"\n\n";
+
+    cout<<"Predicted y values:\n";
+    for(int i =0; i<n; i++) {
+        double y_calc=a+b*x[i];
+        cout<<"x = "<<x[i]<<", y = "<<y_calc<<"\n";
+    }
+    return 0;
+}
 ```
 
 #### Linear Input
 ```
-Add your Linear Curve Fitting input here
+5
+1 2
+2 3
+3 5
+4 4
+5 6
 ```
 
 #### Linear Output
 ```
-Add your Linear Curve Fitting output here
+a (intercept) = 1.3000
+b (slope) = 0.9000
+
+Predicted y values:
+x = 1 , y = 2.2000
+x = 2 , y = 3.1000
+x = 3 , y = 4.0000
+x = 4 , y = 4.9000
+x = 5 , y = 5.8000
 ```
 
 ---
@@ -1020,17 +1534,70 @@ Add your Linear Curve Fitting output here
 
 #### Transcendental Code
 ```cpp
-// Add your Transcendental Curve Fitting code here
+#include <bits/stdc++.h>//y=ae^bx
+using namespace std;
+
+int main() {
+
+    int n;
+    cin>>n;
+
+    vector<double>x(n),y(n);
+    for (int i=0;i<n;i++)
+        cin>>x[i]>>y[i];
+
+    double sumx =0, sumY =0, sumxY =0, sumx2 =0;
+
+    for (int i=0; i <n; i++) {
+        double Y = log(y[i]);   // Y = ln(y)
+        sumx  +=x[i];
+        sumY  +=Y;
+        sumxY +=x[i]*Y;
+        sumx2 +=x[i]*x[i];
+    }
+
+    double B =(n * sumxY -sumx *sumY)/(n * sumx2 -sumx *sumx);
+    double A =(sumY - B * sumx)/n;
+
+    double a =exp(A);
+    double b =B;
+
+    cout<<fixed<<setprecision(6);
+    cout<<"a = "<<a<<"\n";
+    cout<<"b = "<<b<<"\n";
+    cout<<"Model: y = "<<a<<" * e^("<<b<<"x)\n\n";
+
+    cout<<"Calculated y values:\n";
+    for (int i= 0;i<n;i++) {
+        double y_calc=a*exp(b* x[i]);
+        cout<<"x = "<< x[i]<<", y = "<<y_calc<<"\n";
+    }
+    return 0;
+}
 ```
 
 #### Transcendental Input
 ```
-Add your Transcendental Curve Fitting input here
+5
+1 2.7
+2 4.1
+3 6.2
+4 9.1
+5 13.5
 ```
 
 #### Transcendental Output
 ```
-Add your Transcendental Curve Fitting output here
+a = 1.827779
+b = 0.401616
+Model: y = 1.827779 * e^(0.401616x)
+
+Calculated y values:
+x = 1, y = 2.731136
+x = 2, y = 4.080968
+x = 3, y = 6.097936
+x = 4, y = 9.111768
+x = 5, y = 13.615149
 ```
 
 ---
@@ -1039,21 +1606,102 @@ Add your Transcendental Curve Fitting output here
 
 #### Polynomial Theory
 
-[Add your Polynomial Curve Fitting theory here]
+Curve fitting is the process of finding a mathematical function that best approximates a set of data points. In polynomial curve fitting, we fit a polynomial of degree m to n data points (xi, yi).
+
+Steps:
+1. Collect data points:
+   - n pairs of (xi, yi).
+2. Choose the degree m of the polynomial:
+   - The polynomial has the form:
+     y = a0 + a1x + a2x^2 + ⋯ + amx^m
+3. Form the normal equations:
+   - Use the least squares method to minimize the sum of squared differences between actual and predicted values:
+     ∑(yi – polynomial)^2
+   - This gives a system of linear equations in the unknown coefficients a0, a1 ,..., am.
+4. Solve the system using Gaussian Elimination:
+   - Find the coefficients a0, a1, ..., am.
+5. Result:
+   - The polynomial function y = a0 + a1x +...+ amx^m approximates the given data.
 
 #### Polynomial Code
 ```cpp
-// Add your Polynomial Curve Fitting code here
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+#include <cmath>
+
+using namespace std;
+
+int main() {
+    ifstream fin("input.txt");
+    ofstream fout("output.txt");
+
+    int n, m;
+    fin >> n;
+    fin >> m;
+
+    double x[20], y[20];
+
+    for (int i = 0; i < n; i++)
+        fin >> x[i];
+
+    for (int i = 0; i < n; i++)
+        fin >> y[i];
+
+    double A[20][21] = {0};
+
+    for (int i = 0; i <= m; i++) {
+        for (int j = 0; j <= m; j++) {
+            for (int k = 0; k < n; k++)
+                A[i][j] += pow(x[k], i + j);
+        }
+        for (int k = 0; k < n; k++)
+            A[i][m + 1] += y[k] * pow(x[k], i);
+    }
+
+    for (int i = 0; i <= m; i++) {
+        for (int j = i + 1; j <= m; j++) {
+            double ratio = A[j][i] / A[i][i];
+            for (int k = 0; k <= m + 1; k++)
+                A[j][k] -= ratio * A[i][k];
+        }
+    }
+
+    double a[20];
+    for (int i = m; i >= 0; i--) {
+        a[i] = A[i][m + 1];
+        for (int j = i + 1; j <= m; j++)
+            a[i] -= A[i][j] * a[j];
+        a[i] /= A[i][i];
+    }
+
+    fout << fixed << setprecision(4);
+    fout << "y = ";
+    for (int i = 0; i <= m; i++) {
+        fout << a[i];
+        if (i > 0) fout << "x^" << i;
+        if (i != m) fout << " + ";
+    }
+    fout << endl;
+
+    fin.close();
+    fout.close();
+
+    return 0;
+}
 ```
 
 #### Polynomial Input
 ```
-Add your Polynomial Curve Fitting input here
+5
+2
+1 2 3 4 5
+2 4 5 4 5
 ```
 
 #### Polynomial Output
 ```
-Add your Polynomial Curve Fitting output here
+y = 0.3714 + 1.3143x^1 + 0.0857x^2
 ```
 
 ---
@@ -1066,21 +1714,74 @@ Add your Polynomial Curve Fitting output here
 
 #### Simpsons 13 Theory
 
-[Add your Simpson's 1/3 Rule theory here]
+Simpson's 1/3 Rule is a numerical method used to approximate the definite integral of a function when the exact integration is difficult. It approximates the area under a curve using parabolic (quadratic) segments.
+
+Steps:
+1. Divide the interval [a,b] into n sub-intervals, where n must be even.
+2. Calculate the step size:
+   h = (b−a) / n
+3. Apply the formula:
+   - Multiply odd-indexed points by 4 and even-indexed points by 2.
+4. Sum up the results to get the approximate value of the integral.
 
 #### Simpsons 13 Code
 ```cpp
-// Add your Simpson's 1/3 Rule code here
+#include <iostream>
+#include <fstream>
+#include <cmath>
+
+using namespace std;
+
+double f(double x) {
+    return sin(x);
+}
+
+int main() {
+    ifstream fin("input.txt");
+    ofstream fout("output.txt");
+
+    double a, b;
+    int n;
+
+    fin >> a >> b >> n;
+
+    if (n % 2 != 0) {
+        fout << "Error: Number of intervals must be even for Simpson's 1/3 Rule." << endl;
+        return 0;
+    }
+
+    double h = (b - a) / n;
+    double sum = f(a) + f(b);
+
+    for (int i = 1; i < n; i++) {
+        double x = a + i * h;
+        if (i % 2 == 0)
+            sum += 2 * f(x);  
+        else
+            sum += 4 * f(x);   
+    }
+
+    double I = (h / 3.0) * sum;
+
+    fout << "Value of integral : " << I << endl;
+
+    fin.close();
+    fout.close();
+
+    return 0;
+}
 ```
 
 #### Simpsons 13 Input
 ```
-Add your Simpson's 1/3 Rule input here
+0
+3.1416
+6
 ```
 
 #### Simpsons 13 Output
 ```
-Add your Simpson's 1/3 Rule output here
+Value of integral : 2.00086
 ```
 
 ---
@@ -1089,21 +1790,75 @@ Add your Simpson's 1/3 Rule output here
 
 #### Simpsons 38 Theory
 
-[Add your Simpson's 3/8 Rule theory here]
+Simpson's 3/8 Rule is a numerical method used to approximate the definite integral of a function when finding the exact integral is difficult. It is a type of formula that approximates the area under a curve using cubic polynomials.
+
+Steps:
+1. Divide the interval [a,b] into n sub-intervals, where n must be a multiple of 3.
+2. Calculate the step size:
+   h=(b−a)/n
+3. Apply the formula:
+   - Multiply function values at every third point by 2.
+   - Multiply function values at other points by 3.
+4. Sum up the results to get the approximate value of the integral.
 
 #### Simpsons 38 Code
 ```cpp
-// Add your Simpson's 3/8 Rule code here
+#include <iostream>
+#include <fstream>
+#include <cmath>
+
+using namespace std;
+
+double f(double x) {
+    return sin(x);
+}
+
+int main() {
+    ifstream fin("input.txt");
+    ofstream fout("output.txt");
+
+    double a, b;
+    int n;
+
+    fin >> a >> b >> n;
+
+    if (n % 3 != 0) {
+        fout << "Error: Number of intervals must be a multiple of 3." << endl;
+        return 0;
+    }
+
+    double h = (b - a) / n;
+    double sum = f(a) + f(b);
+
+    for (int i = 1; i < n; i++) {
+        double x = a + i * h;
+        if (i % 3 == 0)
+            sum += 2 * f(x);
+        else
+            sum += 3 * f(x);
+    }
+
+    double I = (3 * h / 8.0) * sum;
+
+    fout << "Value of integral : " << I << endl;
+
+    fin.close();
+    fout.close();
+
+    return 0;
+}
 ```
 
 #### Simpsons 38 Input
 ```
-Add your Simpson's 3/8 Rule input here
+0
+3.1416
+6
 ```
 
 #### Simpsons 38 Output
 ```
-Add your Simpson's 3/8 Rule output here
+Value of integral : 2.00201
 ```
 
 ---
